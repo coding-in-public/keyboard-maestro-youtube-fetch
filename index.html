@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YouTube Videos</title>
+</head>
+
+<body data-kmwindow="520,945">
+  <form>
+    <input type="search" class="search" autocomplete="off" spellcheck="false" autofocus placeholder="Type to filter…">
+    <div id="input-list">
+    </div>
+    <div class="buttons">
+      <button class="submit" name="select" type="button">Select
+      </button>
+      <button class="view" name="view" type="button">View All
+      </button>
+      <button class="cancel" name="cancel" type="button">Cancel
+      </button>
+    </div>
+  </form>
+  <style>
+    *,
+    *::after,
+    *::before {
+      border: 0;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --text: hsl(218, 16.7%, 28.2%);
+      --muted: hsl(10, 3.6%, 32.9%, .5);
+      --light: hsl(150, 7.7%, 94.9%, 1);
+      --accent1: 264 91.2% 51.2%;
+      --accent2: 186 91.2% 49%;
+      --radius: 10px;
+      --boxs: 0 5px 5px -3px hsl(var(--accent1) / 10%), 0 3px 14px 2px hsl(var(--accent1) / 6%), 0 8px 10px 0 hsl(var(--accent2) / 7%);
+    }
+
+    body {
+      font-family: 'MesloLGS Nerd Font', sans-serif;
+      color: var(--text);
+      padding: 1.5rem;
+      background-color: var(--light);
+    }
+
+    input,
+    label,
+    button {
+      font: inherit;
+      background: inherit;
+      line-height: inherit;
+    }
+
+    input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+      display: flex;
+      align-items: center;
+    }
+
+    .radio,
+    button {
+      display: flex;
+      align-items: center;
+      padding: 1.3rem .7rem;
+      border-radius: var(--radius);
+      background-color: var(--light);
+      box-shadow: var(--boxs);
+      cursor: pointer;
+    }
+
+    form,
+    #input-list {
+      display: grid;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .radio {
+      border-left: 8px solid transparent;
+      color: var(--text);
+      font-weight: bold;
+      transition: all 160ms cubic-bezier(1, 0.15, 0.86, 1.03);
+    }
+
+    .radio:is(:hover, :focus, :focus-within) {
+      border-left: 8px solid var(--text);
+      color: var(--text);
+      background-color: var(--light);
+      box-shadow: none;
+    }
+
+    .radio__img {
+      border-radius: 6px;
+    }
+
+    .radio__label {
+      padding-left: .6rem;
+    }
+
+    .radio__img, .radio__label, .radio__input {
+      pointer-events: none;
+    }
+    
+    input.search {
+      opacity: initial;
+      width: initial;
+      height: initial;
+      padding: .8rem .6rem;
+      margin-bottom: .8rem;
+      border: 2px solid transparent;
+      border-radius: var(--radius);
+      background-color: var(--light);
+      box-shadow: var(--boxs);
+    }
+
+    input.search:focus {
+      outline: none;
+      box-shadow: none;
+      border: 2px solid var(--text);
+    }
+
+    input.search::placeholder {
+      color: var(--muted);
+    }
+
+    .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    button {
+      flex: 1 1 25%;
+      border-radius: 10px;
+      display: inline-block; 
+      color: var(--text);
+      background-color: var(--light);
+      border: 4px solid var(--text);
+      padding: .8rem 1.2rem;
+    }
+
+    button:is(:hover, :focus) {
+      color: var(--light);
+      background-color: var(--text);
+      border: 4px solid transparent;
+      outline: none;
+      box-shadow: none;
+    }
+
+    button.cancel:is(:hover, :focus) {
+      --text: hsl(0, 66%, 57%);
+      background-color: var(--text);
+      color: var(--light);
+    }
+  </style>
+  <script>
+    let list = [];
+    let maxDisplayLimit = 4;
+    const displayList = document.querySelector('#input-list');
+    const search = document.querySelector('.search');
+
+    function textMatch(item) {
+      const searchTerm = search.value.toLowerCase();
+      const matchingItems = item.name.toLowerCase();
+      return matchingItems.indexOf(searchTerm) !== -1;
+    }
+
+    function getFilteredItems() {
+      displayList.innerHTML = list.filter(textMatch).slice(0, maxDisplayLimit).map((item) => `<label class="radio" for=${item.id}>
+        <input type="radio" class="radio__input" value="${item.id}" />
+        <img class="radio__img" src="${item.thumbnail}" width="220px">
+        <span class ="radio__label">${item.name}</span>
+      </label>`).join('')
+    }
+
+    function submitMacro() {
+      if(!document.activeElement.classList.contains('radio__input')){return};
+      window.KeyboardMaestro.SetVariable('youTubeID', document.activeElement.value);
+      window.KeyboardMaestro.SetVariable('cancel', 'false');
+      window.KeyboardMaestro.Submit();
+    }
+
+    function viewAllIcons() {
+      search.value = '';
+      maxDisplayLimit = 500;
+      getFilteredItems();
+    }
+
+    function cancelMacro() {
+      window.KeyboardMaestro.SetVariable('cancel', 'true');
+      window.KeyboardMaestro.Cancel();
+    }
+    
+    // event listeners
+    search.addEventListener('keyup', getFilteredItems);
+    document.querySelector('.submit').addEventListener('click', submitMacro);
+    document.querySelector('.view').addEventListener('click', viewAllIcons);
+    document.querySelector('.cancel').addEventListener('click', cancelMacro);
+    displayList.addEventListener('click', (e) => {
+      e.target.classList.contains('radio') ? e.target.querySelector('input').focus() : null;
+    });
+    displayList.addEventListener('dblclick', (e) => {
+        e.target.classList.contains('radio') ? submitMacro() : null;
+    });
+    
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        submitMacro();
+      }
+      if (e.key === 'Escape') {
+        cancelMacro();
+      }
+      if (e.key === 'ArrowDown' && document.activeElement === search) {
+        document.querySelector('.radio__input').focus();
+      }
+    });
+
+    async function fetchData() {
+      await fetch('ENDPOINT')
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then((data) => {
+          list = data.map((video) => ({
+            name: video.snippet.title,
+            id: video.snippet.resourceId.videoId,
+            thumbnail: video.snippet.thumbnails.medium.url,
+          }));
+          getFilteredItems();
+        })
+        .catch((error) => {
+          console.error('There has been a problem with your fetch operation:', error);
+        });
+    }
+    fetchData();
+  </script>
+</body>
+</html>
