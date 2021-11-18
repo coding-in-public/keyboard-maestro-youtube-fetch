@@ -2,4 +2,4 @@ I wrote a custom HTML prompt script in Keyboard Maestro that let’s me quickly 
 
 ![](https://res.cloudinary.com/cpenned/image/upload/v1637255414/Blog/post-images/20211117-youtube-keyboard-maestro-script-gif.gif)
 
-For a walk through of the code tutorial, see http://chrispennington.blog/blog/custom-html-prompt-with-keyboard-maestro/.
+For a walk through of the code tutorial, see https://chrispennington.blog/blog/custom-html-prompt-with-keyboard-maestro/.
